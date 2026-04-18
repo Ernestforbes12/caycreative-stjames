@@ -8,12 +8,16 @@
 
 import HeroSection from '@/components/HeroSection'
 import ServiceTimes from '@/components/ServiceTimes'
+import AboutSnippet from '@/components/AboutSnippet'
+import EventsPreview from '@/components/EventsPreview'
 
 export default function Home() {
   return (
     <main>
       <HeroSection />
       <ServiceTimes />
+      <AboutSnippet />
+      <EventsPreview />
     </main>
   )
 }

@@ -24,6 +24,7 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import VerseOfTheDay from '@/components/VerseOfTheDay'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -202,18 +203,8 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Bible verse card */}
-          <div
-            className="max-w-xs p-5"
-            style={{ borderLeft: '2px solid #C9A227', background: 'rgba(255,255,255,0.03)' }}
-          >
-            <p className="font-[family-name:var(--font-playfair)] text-white/70 italic text-sm leading-relaxed mb-3">
-              "For where two or three are gathered together in my name, there am I in the midst of them."
-            </p>
-            <cite className="text-[#C9A227] text-xs tracking-[0.15em] uppercase not-italic">
-              Matthew 18:20
-            </cite>
-          </div>
+          {/* Daily verse — updates automatically every day */}
+          <VerseOfTheDay />
 
         </div>
 
