@@ -8,6 +8,7 @@
 
 import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 /**
  * Playfair Display — heading font
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
       className={`${playfair.variable} ${inter.variable}`}
     >
       <body className="bg-[#FAF7F2] text-[#1A1A1A] antialiased">
+        <Navbar />
         {children}
       </body>
     </html>
