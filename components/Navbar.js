@@ -84,11 +84,14 @@ export default function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`text-xs font-medium tracking-widest uppercase transition-colors duration-300 ${
-                  scrolled
-                    ? 'text-[#6B6B6B] hover:text-[#7A1B1B]'
-                    : 'text-white/80 hover:text-[#C9A227]'
-                }`}
+                className="text-xs font-medium tracking-widest uppercase transition-all duration-300"
+                style={{ color: scrolled ? '#4a4a4a' : '#ffffff' }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = scrolled ? '#7A1B1B' : '#C9A227'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = scrolled ? '#4a4a4a' : '#ffffff'
+                }}
               >
                 {link.label}
               </Link>

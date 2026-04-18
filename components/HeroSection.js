@@ -123,6 +123,14 @@ export default function HeroSection() {
         }}
       />
 
+      {/* Top gradient — makes navbar links readable against the dark hero */}
+      <div
+        className="absolute top-0 left-0 right-0 h-32"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)',
+        }}
+      />
+
       {/* Main content grid */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-24 pb-16">
 
@@ -211,18 +219,7 @@ export default function HeroSection() {
 
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        ref={scrollRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="text-white/30 text-xs tracking-[0.2em] uppercase">Scroll</span>
-        <div
-          className="w-px h-12 animate-pulse"
-          style={{ background: 'linear-gradient(to bottom, #C9A227, transparent)' }}
-        />
-      </div>
-
+      
     </section>
   )
 }

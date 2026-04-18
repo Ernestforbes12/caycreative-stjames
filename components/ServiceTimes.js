@@ -31,6 +31,7 @@ const services = [
     time: '9:30 AM',
     location: 'Education Wing',
     description: 'Interactive biblical learning for all ages — from children to seniors.',
+    image: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&q=80',
   },
   {
     icon: Sun,
@@ -39,6 +40,7 @@ const services = [
     time: '11:00 AM',
     location: 'Main Sanctuary',
     description: 'A soulful experience of traditional hymns, gospel choir, and powerful scripture.',
+    image: 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80',
   },
   {
     icon: Moon,
@@ -47,6 +49,7 @@ const services = [
     time: '7:00 PM',
     location: 'Fellowship Hall',
     description: 'Mid-week spiritual nourishment through deep theological discussion and prayer.',
+    image: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=800&q=80',
   },
 ]
 
@@ -66,12 +69,14 @@ export default function ServiceTimes() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top 80%',
+          toggleActions: 'play none none none',
         },
         opacity: 0,
         y: 50,
         duration: 0.8,
         stagger: 0.2,
         ease: 'power3.out',
+        immediateRender: false,
       })
 
     }, sectionRef)
@@ -108,6 +113,15 @@ export default function ServiceTimes() {
               >
                 {/* Gold top border that grows on hover */}
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#C9A227] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+
+                {/* Card image */}
+                <div className="w-full h-40 mb-6 overflow-hidden">
+                <img
+                 src={service.image}
+                 alt={service.name}
+                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                 />
+                </div>
 
                 {/* Icon */}
                 <Icon
