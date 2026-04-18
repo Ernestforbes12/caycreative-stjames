@@ -10,6 +10,7 @@ import HeroSection from '@/components/HeroSection'
 import ServiceTimes from '@/components/ServiceTimes'
 import AboutSnippet from '@/components/AboutSnippet'
 import EventsPreview from '@/components/EventsPreview'
+import CTABanner from '@/components/CTABanner'
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <ServiceTimes />
       <AboutSnippet />
       <EventsPreview />
+      <CTABanner />
     </main>
   )
 }
