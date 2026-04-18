@@ -9,6 +9,7 @@
 import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 /**
  * Playfair Display — heading font
@@ -52,6 +53,7 @@ export default function RootLayout({ children }) {
       <body className="bg-[#FAF7F2] text-[#1A1A1A] antialiased">
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   )
