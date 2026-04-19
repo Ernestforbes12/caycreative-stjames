@@ -90,10 +90,11 @@ export default function AboutSnippet() {
                 background: 'linear-gradient(135deg, #2a0a0a, #4a1010)',
               }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&q=80"
-                alt="St. James Native Baptist Church congregation"
+             <img
+                src="/images/church3.jpeg"
+                alt="St. James Native Baptist Church sign — Organized 1856 by Rev. Thomas Romer"
                 className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-700"
+                style={{ objectPosition: 'center top' }}
               />
             </div>
 
@@ -129,13 +130,13 @@ export default function AboutSnippet() {
             <div className="w-12 h-0.5 bg-[#C9A227] mb-8" />
 
             <p className="text-[#6B6B6B] leading-loose mb-8 text-base">
-              For 170 years, St. James Native Baptist Church has stood as a
-              pillar of faith and community in the heart of Nassau, Bahamas.
-              We are a Christ-centered congregation committed to biblical
-              truth, loving fellowship, and serving our island home with
-              the soul-nourishing message of the Gospel.
+              Founded in 1856 by Rev. Thomas Romer, St. James Native Baptist 
+              Church has stood for 170 years as a pillar of faith and community 
+              in the heart of Nassau, Bahamas. We are a Christ-centered 
+              congregation committed to biblical truth, loving fellowship, and 
+              serving our island home with the soul-nourishing message of the Gospel.
             </p>
-
+            
             {/* Core values grid */}
             <div className="grid grid-cols-2 gap-4 mb-10">
               {values.map((value) => (

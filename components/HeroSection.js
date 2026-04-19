@@ -105,22 +105,25 @@ export default function HeroSection() {
   }, [])
 
   return (
-    <section
+   <section
       ref={heroRef}
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #2a0a0a 0%, #4a1010 35%, #1B3A6B 100%)',
+        backgroundImage: 'url(/images/church2.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
 
       {/* Background texture overlay */}
       <div className="absolute inset-0 opacity-5 bg-[url('/noise.png')] bg-repeat" />
 
-      {/* Dark gradient overlay */}
+      {/* Dark gradient overlay — covers photo so text is readable */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to right, rgba(42,10,10,0.95) 50%, rgba(42,10,10,0.3))',
+          background: 'linear-gradient(to right, rgba(42,10,10,0.97) 45%, rgba(42,10,10,0.75) 100%)',
         }}
       />
 
