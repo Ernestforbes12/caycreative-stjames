@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
 /**
  * Navigation links array
@@ -106,7 +106,7 @@ export default function Navbar() {
           Join Us Sunday
         </button>
 
-        {/* Mobile Hamburger Button */}
+        {/* Mobile Menu Button — prayer hands when closed, X when open */}
         <button
           className={`md:hidden transition-colors duration-300 ${
             scrolled ? 'text-[#7A1B1B]' : 'text-white'
@@ -114,8 +114,86 @@ export default function Navbar() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          {menuOpen ? (
+            <X size={24} />
+          ) : (
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 64 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="transition-transform duration-300 hover:scale-110"
+            >
+              {/* Prayer hands SVG — two hands pressed together */}
+              <path
+                d="M20 48 C20 48 14 42 12 34 C10 26 12 18 16 14 C18 12 20 12 21 13 C22 14 22 16 21 18 L19 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M19 24 C19 24 17 20 19 16 C20 14 22 13 24 14 C26 15 26 17 25 20 L23 26"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M23 26 C23 26 22 22 24 18 C25 16 27 15 29 16 C31 17 31 20 30 23 L28 29"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M28 29 C28 29 27 25 29 21 C30 19 32 18 34 19 C36 20 36 23 35 26 L32 48"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M44 48 C44 48 50 42 52 34 C54 26 52 18 48 14 C46 12 44 12 43 13 C42 14 42 16 43 18 L45 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M45 24 C45 24 47 20 45 16 C44 14 42 13 40 14 C38 15 38 17 39 20 L41 26"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M41 26 C41 26 42 22 40 18 C39 16 37 15 35 16 C33 17 33 20 34 23 L36 29"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M36 29 C36 29 37 25 35 21 C34 19 32 18 30 19 C28 20 28 23 29 26 L32 48"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Base of hands */}
+              <path
+                d="M20 48 Q32 52 44 48"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          )}
         </button>
+        
       </div>
 
       {/* Mobile Menu Dropdown */}
