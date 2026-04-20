@@ -3,6 +3,7 @@
  *
  * Handles POST requests from the PrayerRequestForm component.
  * Validates, sanitizes, and stores submissions in Supabase.
+ * Sends email notification to pastor via Resend.
  *
  * Security:
  * - Input validation on all fields
@@ -16,12 +17,15 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 import { NextResponse } from 'next/server'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 /**
  * sanitize — strips HTML tags from user input
@@ -72,7 +76,6 @@ export async function POST(request) {
     const body = await request.json()
     const { name, email, prayerRequest, isAnonymous } = body
 
-    // Prayer request text is the only required field
     if (!prayerRequest) {
       return NextResponse.json(
         { message: 'Please enter your prayer request.' },
@@ -80,7 +83,6 @@ export async function POST(request) {
       )
     }
 
-    // Validate email only if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(email)) {
@@ -91,7 +93,6 @@ export async function POST(request) {
       }
     }
 
-    // Sanitize all inputs
     const sanitizedData = {
       name: isAnonymous ? null : sanitize(name),
       email: isAnonymous ? null : sanitize(email),
@@ -99,12 +100,59 @@ export async function POST(request) {
       is_anonymous: isAnonymous || false,
     }
 
-    // Store in Supabase prayer_requests table
+    // Store in Supabase
     const { error } = await supabase
       .from('prayer_requests')
       .insert([sanitizedData])
 
     if (error) throw error
+
+    /**
+     * Send email notification to pastor via Resend
+     * Pastor receives an email every time a prayer request is submitted
+     * Anonymous requests show "Anonymous" as the name
+     */
+    await resend.emails.send({
+      from: 'St. James Website <ernest@caycreative242.com>',
+      to: 'ernestforbes2002@gmail.com',
+      subject: 'New Prayer Request — St. James Native Baptist Church',
+      html: `
+        <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FAF7F2;">
+          
+          <div style="background: #7A1B1B; padding: 30px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #C9A227; font-size: 24px; margin: 0;">St. James Native Baptist Church</h1>
+            <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin: 8px 0 0;">New Prayer Request Received</p>
+          </div>
+
+          <div style="background: white; padding: 30px; border-left: 4px solid #C9A227; margin-bottom: 20px;">
+            <p style="color: #6B6B6B; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 8px;">From</p>
+            <p style="color: #1A1A1A; font-size: 16px; font-weight: bold; margin: 0;">
+              ${isAnonymous ? 'Anonymous' : sanitize(name) || 'Not provided'}
+            </p>
+            ${!isAnonymous && email ? `
+            <p style="color: #6B6B6B; font-size: 14px; margin: 4px 0 0;">${sanitize(email)}</p>
+            ` : ''}
+          </div>
+
+          <div style="background: white; padding: 30px; border-left: 4px solid #7A1B1B; margin-bottom: 20px;">
+            <p style="color: #6B6B6B; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 12px;">Prayer Request</p>
+            <p style="color: #1A1A1A; font-size: 16px; line-height: 1.8; margin: 0;">
+              ${sanitize(prayerRequest)}
+            </p>
+          </div>
+
+          <div style="text-align: center; padding: 20px;">
+            <p style="color: #6B6B6B; font-size: 12px; margin: 0;">
+              This request was submitted through stjamesnativebaptist.com
+            </p>
+            <p style="color: #C9A227; font-size: 11px; margin: 8px 0 0; text-transform: uppercase; letter-spacing: 1px;">
+              St. James Native Baptist Church — Nassau, Bahamas
+            </p>
+          </div>
+
+        </div>
+      `,
+    })
 
     return NextResponse.json({ success: true }, { status: 200 })
 
