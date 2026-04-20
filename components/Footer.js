@@ -123,19 +123,26 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/30 tracking-widest uppercase font-medium">
+        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/30 tracking-wider uppercase">
           <span>© {new Date().getFullYear()} St. James Native Baptist Church, Nassau, Bahamas</span>
-          <span>
-            Designed & Developed by{' '}
-            <a 
-              href="https://caycreative242.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#C9A227] hover:text-[#e8c35a] transition-colors font-bold"
-            >
-              Cay Creative
-            </a>
-          </span>
+
+          {/* Cay Creative credit with logo */}
+          
+            < a href="https://caycreative242.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 group transition-all duration-300"
+          >
+            <img
+              src="/images/cay-creative-logo.png"
+              alt="Cay Creative"
+              className="w-6 h-6 object-contain opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+            <span className="text-white/30 group-hover:text-[#C9A227] transition-colors duration-300">
+              Designed & Developed by Cay Creative
+            </span>
+          </a>
         </div>
       </div>
     </footer>
