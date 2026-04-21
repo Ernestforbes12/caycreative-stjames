@@ -42,6 +42,10 @@ export const metadata = {
   title: 'St. James Native Baptist Church | Nassau, Bahamas',
   description: 'A Christ Centered Church in Nassau, Bahamas. Join us for Sunday Worship at 11:00 AM. Est. 1856.',
   keywords: 'church Nassau Bahamas, Native Baptist Church, St James Church Nassau',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({ children }) {
