@@ -1,7 +1,14 @@
 /**
  * Sermons Page — app/sermons/page.js
+ *
+ * Fetches and displays sermons from Sanity CMS.
+ * Church staff can manage sermons through the Sanity Studio at /studio.
+ *
+ * Data fetching uses GROQ — Sanity's query language.
+ * Results are sorted by date — newest first.
  */
 
+import { sanityClient } from '@/lib/sanity'
 import { Play, Calendar, User, Headphones } from 'lucide-react'
 
 export const metadata = {
@@ -9,71 +16,51 @@ export const metadata = {
   description: 'Watch and listen to sermons from St. James Native Baptist Church in Nassau, Bahamas.',
 }
 
-const sermons = [
-  {
-    title: 'Walking in Faith Through Uncertain Times',
-    preacher: 'Pastor',
-    date: 'April 20, 2026',
-    scripture: 'Hebrews 11:1',
-    description: 'A powerful message about maintaining unwavering faith even when the path ahead is unclear.',
-    duration: '45 min',
-    featured: true,
-  },
-  {
-    title: 'The Power of Prayer',
-    preacher: 'Pastor',
-    date: 'April 13, 2026',
-    scripture: 'James 5:16',
-    description: 'Exploring the transformative power of a consistent and sincere prayer life.',
-    duration: '38 min',
-    featured: false,
-  },
-  {
-    title: 'Soul Food — Feeding Your Spirit Daily',
-    preacher: 'Pastor',
-    date: 'April 6, 2026',
-    scripture: 'Matthew 4:4',
-    description: 'Understanding the importance of daily spiritual nourishment through the Word of God.',
-    duration: '42 min',
-    featured: false,
-  },
-  {
-    title: 'Rooted and Grounded in Love',
-    preacher: 'Pastor',
-    date: 'March 30, 2026',
-    scripture: 'Ephesians 3:17',
-    description: 'How being rooted in the love of Christ transforms every area of our lives.',
-    duration: '40 min',
-    featured: false,
-  },
-  {
-    title: 'The God Who Restores',
-    preacher: 'Pastor',
-    date: 'March 23, 2026',
-    scripture: 'Joel 2:25',
-    description: 'A message of hope for those who feel broken — God specializes in restoration.',
-    duration: '44 min',
-    featured: false,
-  },
-  {
-    title: 'Community — Better Together',
-    preacher: 'Pastor',
-    date: 'March 16, 2026',
-    scripture: 'Ecclesiastes 4:9-10',
-    description: 'Why God designed us for community and how we can strengthen our bonds as a church family.',
-    duration: '36 min',
-    featured: false,
-  },
-]
+/**
+ * GROQ query — fetches all sermons from Sanity
+ * sorted by date descending — newest first
+ */
+const sermonsQuery = `*[_type == "sermon"] | order(date desc) {
+  _id,
+  title,
+  preacher,
+  date,
+  scripture,
+  description,
+  audioUrl,
+  videoUrl,
+  featured,
+  "thumbnail": thumbnail.asset->url
+}`
 
-const featuredSermon = sermons.find(s => s.featured)
-const archiveSermons = sermons.filter(s => !s.featured)
+export default async function SermonsPage() {
+  /**
+   * Fetch sermons from Sanity at request time
+   * This means new sermons published in the studio
+   * appear on the website automatically
+   */
+  const sermons = await sanityClient.fetch(sermonsQuery)
 
-export default function SermonsPage() {
+  const featuredSermon = sermons.find(s => s.featured) || sermons[0]
+  const archiveSermons = sermons.filter(s => s._id !== featuredSermon?._id)
+
+  /**
+   * Format date from Sanity — converts 2026-04-20 to April 20, 2026
+   */
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
+
   return (
     <main>
+
       {/* Hero */}
-      <section className="relative h-[45vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <img
           src="/images/church3.jpeg"
           alt="St. James Native Baptist Church"
@@ -81,136 +68,174 @@ export default function SermonsPage() {
           style={{ objectPosition: 'center 40%' }}
         />
         <div
-          className="absolute inset-0 bg-[#2a0a0a]/90"
+          className="absolute inset-0"
+          style={{ background: 'rgba(42,10,10,0.88)' }}
         />
         <div className="relative z-10 text-center px-6">
-          <span className="text-[#C9A227] text-xs font-bold tracking-[0.3em] uppercase block mb-4">
+          <span className="text-[#C9A227] text-xs font-semibold tracking-[0.25em] uppercase block mb-4">
             The Word of God
           </span>
           <h1
             className="font-[family-name:var(--font-playfair)] text-white font-black leading-tight"
-            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
           >
-            Sermon Archive
+            Sermons
           </h1>
-          <div className="w-16 h-1 bg-[#C9A227] mx-auto mt-6" />
+          <div className="w-12 h-0.5 bg-[#C9A227] mx-auto mt-6" />
         </div>
       </section>
+
+      {/* No sermons state */}
+      {sermons.length === 0 && (
+        <section className="py-24 bg-white text-center">
+          <p className="text-[#6B6B6B]">No sermons have been published yet. Check back soon.</p>
+        </section>
+      )}
 
       {/* Featured Sermon */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <span className="text-[#C9A227] text-xs font-bold tracking-[0.25em] uppercase block mb-3">
-              Most Recent Message
-            </span>
-            <h2 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold text-3xl md:text-4xl">
-              Featured Sermon
-            </h2>
-          </div>
-
-          <div
-            className="max-w-4xl mx-auto p-8 md:p-16 relative shadow-2xl"
-            style={{ background: '#FAF7F2', borderLeft: '6px solid #C9A227' }}
-          >
-            <div className="flex flex-wrap items-center gap-6 mb-8">
-              <span className="px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase bg-[#C9A227] text-white">
-                Newest
+      {featuredSermon && (
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <span className="text-[#C9A227] text-xs font-semibold tracking-[0.25em] uppercase block mb-3">
+                Latest Message
               </span>
-              <div className="flex items-center gap-2 text-[#6B6B6B] text-xs font-medium">
-                <Calendar size={14} className="text-[#C9A227]" />
-                {featuredSermon.date}
-              </div>
-              <div className="flex items-center gap-2 text-[#6B6B6B] text-xs font-medium">
-                <User size={14} className="text-[#C9A227]" />
-                {featuredSermon.preacher}
-              </div>
-              <div className="flex items-center gap-2 text-[#6B6B6B] text-xs font-medium">
-                <Headphones size={14} className="text-[#C9A227]" />
-                {featuredSermon.duration}
-              </div>
-            </div>
-
-            <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold mb-4 leading-tight text-2xl md:text-4xl">
-              {featuredSermon.title}
-            </h3>
-
-            <p className="text-[#C9A227] text-sm font-bold italic mb-6">
-              {featuredSermon.scripture}
-            </p>
-
-            <p className="text-[#6B6B6B] leading-loose mb-10 text-lg">
-              {featuredSermon.description}
-            </p>
-
-            <a
-              href="#"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-[#7A1B1B] text-white text-xs font-bold tracking-widest uppercase transition-all duration-300 hover:bg-[#5a1414] hover:shadow-xl"
-            >
-              <Play size={18} fill="currentColor" />
-              Listen to Message
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Sermon Archive Grid */}
-      <section className="py-24 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-            <div className="max-w-xl">
-              <span className="text-[#C9A227] text-xs font-bold tracking-[0.25em] uppercase block mb-3">
-                Library
-              </span>
-              <h2 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold text-3xl md:text-4xl">
-                Browse Past Messages
-              </h2>
-            </div>
-            <div className="w-16 h-1 bg-[#C9A227]" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {archiveSermons.map((sermon) => (
-              <div
-                key={sermon.title}
-                className="bg-white p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl flex flex-col"
-                style={{ borderTop: '4px solid #C9A227' }}
+              <h2
+                className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)' }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <p className="text-[#C9A227] text-[11px] font-bold uppercase tracking-wider">
-                    {sermon.scripture}
-                  </p>
-                  <div className="text-[10px] text-white bg-[#7A1B1B]/10 text-[#7A1B1B] px-2 py-1 font-bold rounded">
-                    {sermon.duration}
-                  </div>
-                </div>
+                Featured Sermon
+              </h2>
+              <div className="w-12 h-0.5 bg-[#C9A227] mx-auto mt-6" />
+            </div>
 
-                <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] text-xl font-bold mb-4 leading-snug group-hover:text-[#C9A227] transition-colors">
-                  {sermon.title}
-                </h3>
-
-                <p className="text-[#6B6B6B] text-sm leading-relaxed mb-8 flex-1 line-clamp-3">
-                  {sermon.description}
-                </p>
-
-                <div className="pt-6 border-t border-[#E0DDD8] flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-2 text-[10px] text-[#6B6B6B] font-bold uppercase tracking-widest">
-                    <Calendar size={12} className="text-[#C9A227]" />
-                    {sermon.date}
-                  </div>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-[#7A1B1B] hover:text-[#C9A227] transition-colors"
-                  >
-                    <Play size={12} fill="currentColor" />
-                    Play
-                  </a>
-                </div>
+            <div
+              className="max-w-4xl mx-auto p-10 md:p-16"
+              style={{ background: '#FAF7F2', borderLeft: '4px solid #C9A227' }}
+            >
+              <div className="flex flex-wrap items-center gap-4 mb-6">
+                <span
+                  className="px-3 py-1 text-xs font-semibold tracking-widest uppercase text-white"
+                  style={{ background: '#C9A227' }}
+                >
+                  Latest
+                </span>
+                <span className="text-[#6B6B6B] text-xs flex items-center gap-1">
+                  <Calendar size={12} className="text-[#C9A227]" />
+                  {formatDate(featuredSermon.date)}
+                </span>
+                <span className="text-[#6B6B6B] text-xs flex items-center gap-1">
+                  <User size={12} className="text-[#C9A227]" />
+                  {featuredSermon.preacher}
+                </span>
               </div>
-            ))}
+
+              <h3
+                className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold mb-3 leading-tight"
+                style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)' }}
+              >
+                {featuredSermon.title}
+              </h3>
+
+              {featuredSermon.scripture && (
+                <p className="text-[#C9A227] text-sm font-semibold italic mb-4">
+                  {featuredSermon.scripture}
+                </p>
+              )}
+
+              {featuredSermon.description && (
+                <p className="text-[#6B6B6B] leading-loose mb-8">
+                  {featuredSermon.description}
+                </p>
+              )}
+
+              {/* Audio or Video link */}
+              {(featuredSermon.videoUrl || featuredSermon.audioUrl) && (
+                
+                  <a href={featuredSermon.videoUrl || featuredSermon.audioUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-4 text-white text-xs font-semibold tracking-widest uppercase transition-all duration-300 hover:opacity-80"
+                  style={{ background: '#7A1B1B' }}
+                >
+                  <Play size={16} />
+                  {featuredSermon.videoUrl ? 'Watch Sermon' : 'Listen to Sermon'}
+                </a>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Sermon Archive */}
+      {archiveSermons.length > 0 && (
+        <section className="py-24 bg-[#FAF7F2]">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <span className="text-[#C9A227] text-xs font-semibold tracking-[0.25em] uppercase block mb-3">
+                Past Messages
+              </span>
+              <h2
+                className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)' }}
+              >
+                Sermon Archive
+              </h2>
+              <div className="w-12 h-0.5 bg-[#C9A227] mx-auto mt-6" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {archiveSermons.map((sermon) => (
+                <div
+                  key={sermon._id}
+                  className="bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  style={{ borderTop: '3px solid #C9A227' }}
+                >
+                  {sermon.scripture && (
+                    <p className="text-[#C9A227] text-xs font-semibold italic mb-3">
+                      {sermon.scripture}
+                    </p>
+                  )}
+
+                  <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] text-lg font-bold mb-3 leading-snug">
+                    {sermon.title}
+                  </h3>
+
+                  {sermon.description && (
+                    <p className="text-[#6B6B6B] text-sm leading-relaxed mb-6">
+                      {sermon.description}
+                    </p>
+                  )}
+
+                  <div className="space-y-2 pt-4 border-t border-[#E0DDD8]">
+                    <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
+                      <Calendar size={12} className="text-[#C9A227]" />
+                      <span>{formatDate(sermon.date)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
+                      <User size={12} className="text-[#C9A227]" />
+                      <span>{sermon.preacher}</span>
+                    </div>
+                  </div>
+
+                  {(sermon.videoUrl || sermon.audioUrl) && (
+                    
+                      <a href={sermon.videoUrl || sermon.audioUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-[#7A1B1B] hover:text-[#C9A227] transition-colors duration-300"
+                    >
+                      <Play size={14} />
+                      {sermon.videoUrl ? 'Watch Now' : 'Listen Now'}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
     </main>
   )
 }
