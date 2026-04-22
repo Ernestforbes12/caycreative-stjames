@@ -1,96 +1,72 @@
 /**
  * EventsPreview Component — components/EventsPreview.js
  *
- * Displays a preview of the three most upcoming events on the homepage.
- * Full events list lives on the /events page managed via Sanity CMS.
+ * Displays the three most upcoming featured events on the homepage.
+ * Fetches live data from Sanity CMS — no hardcoded events.
  *
- * Features:
- * - Three event cards in a horizontal grid
- * - Horizontal scroll section on mobile
- * - Date badge on each card
- * - GSAP scroll triggered stagger animation
- * - Links through to full Events page
+ * Church staff can mark events as "Featured on Homepage" in Sanity Studio
+ * to control which events appear here.
  *
- * Note: Events are hardcoded for now — will be replaced with
- * Sanity CMS fetch once CMS is configured in a later step.
+ * If fewer than 3 events are featured — shows the 3 soonest upcoming events.
  */
 
-'use client'
-
-import { useEffect, useRef } from 'react'
+import { sanityClient } from '@/lib/sanity'
 import Link from 'next/link'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Calendar, MapPin, ChevronRight } from 'lucide-react'
-
-gsap.registerPlugin(ScrollTrigger)
+import { MapPin, Calendar, ChevronRight } from 'lucide-react'
 
 /**
- * Placeholder events — replace with Sanity CMS fetch later
- * Each event needs: title, description, date, month, day, location, category, image
+ * GROQ query — fetches 3 upcoming events
+ * Prioritizes featured events first
+ * Falls back to soonest upcoming events
  */
-const events = [
-  {
-    title: 'Harvest Festival Luncheon',
-    description: 'Annual celebration of gratitude featuring island delicacies and warm fellowship.',
-    day: '18',
-    month: 'May',
-    location: 'Fellowship Hall',
-    category: 'Community',
-    image: 'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=800&q=80',
-  },
-  {
-    title: 'Voices of Zion Concert',
-    description: 'An evening of contemporary gospel and classic hymns performed by our combined choirs.',
-    day: '25',
-    month: 'May',
-    location: 'Main Sanctuary',
-    category: 'Music Ministry',
-    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80',
-  },
-  {
-    title: 'Community Outreach Day',
-    description: 'Serving local Nassau families through food, prayer, and the love of Christ.',
-    day: '01',
-    month: 'Jun',
-    location: 'St James Road',
-    category: 'Outreach',
-    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
-  },
-]
+const eventsQuery = `*[_type == "event"] | order(featured desc, eventDate asc)[0...3] {
+  _id,
+  title,
+  description,
+  eventDate,
+  eventTime,
+  location,
+  category,
+  featured,
+  "slug": slug.current,
+  "image": image.asset->url
+}`
 
-export default function EventsPreview() {
-  const sectionRef = useRef(null)
-  const cardsRef = useRef([])
+export default async function EventsPreview() {
+  let events = []
+  try {
+    events = await sanityClient.fetch(eventsQuery)
+  } catch (error) {
+    console.error('Failed to fetch events:', error)
+  }
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
+  /**
+   * Format day — e.g. 18
+   */
+ const getDay = (dateStr) => {
+    if (!dateStr) return ''
+    return dateStr.split('-')[2]
+  }
 
-      /**
-       * Cards stagger in from below as section enters viewport
-       * Each card is delayed slightly after the previous one
-       */
-      gsap.from(cardsRef.current, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0,
-        y: 60,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power3.out',
-        immediateRender: false,
-      })
-
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [])
+  const getMonth = (dateStr) => {
+    if (!dateStr) return ''
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    return months[parseInt(dateStr.split('-')[1]) - 1]
+  }
+  /**
+   * Format full date — e.g. May 18, 2026
+   */
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
 
   return (
-    <section ref={sectionRef} className="py-24 bg-[#FAF7F2]">
+    <section className="py-24 bg-[#FAF7F2]">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Section header */}
@@ -107,82 +83,103 @@ export default function EventsPreview() {
             </h2>
           </div>
           <Link href="/events">
-            <button
-              className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase transition-all duration-300"
-              style={{ color: '#7A1B1B', borderBottom: '1px solid #C9A227', paddingBottom: '2px' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#C9A227'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#7A1B1B'}
-            >
+            <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-[#7A1B1B] hover:text-[#C9A227] transition-colors duration-300 border-b border-[#C9A227] pb-0.5">
               View All Events
               <ChevronRight size={14} />
-            </button>
+            </span>
           </Link>
         </div>
 
+        {/* No events state */}
+        {events.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-[#6B6B6B]">No upcoming events at this time. Check back soon.</p>
+          </div>
+        )}
+
         {/* Events grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {events.map((event, index) => (
-            <div
-              key={event.title}
-              ref={(el) => (cardsRef.current[index] = el)}
-              className="bg-white group cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
-            >
+        {events.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {events.map((event) => (
+              <Link
+                key={event._id}
+                href={event.slug ? `/events/${event.slug}` : '/events'}
+                className="bg-white group cursor-pointer overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl block"
+              >
 
-              {/* Event image with date badge */}
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                {/* Event image with date badge */}
+                <div className="relative h-52 overflow-hidden">
+                  {event.image ? (
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ background: 'linear-gradient(135deg, #2a0a0a, #4a1010)' }}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
 
-                {/* Dark overlay on hover */}
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
-
-                {/* Date badge */}
-                <div
-                  className="absolute top-4 left-4 p-3 text-center"
-                  style={{ background: '#C9A227' }}
-                >
-                  <div className="font-[family-name:var(--font-playfair)] text-white text-2xl font-black leading-none">
-                    {event.day}
+                  {/* Date badge */}
+                  <div
+                    className="absolute top-4 left-4 p-3 text-center"
+                    style={{ background: '#C9A227' }}
+                  >
+                    <div className="font-[family-name:var(--font-playfair)] text-white text-2xl font-black leading-none">
+                      {getDay(event.eventDate)}
+                    </div>
+                    <div className="text-white/85 text-xs tracking-widest uppercase mt-0.5">
+                      {getMonth(event.eventDate)}
+                    </div>
                   </div>
-                  <div className="text-white/85 text-xs tracking-widest uppercase mt-0.5">
-                    {event.month}
+
+                  {/* Category badge */}
+                  {event.category && (
+                    <div
+                      className="absolute top-4 right-4 px-3 py-1"
+                      style={{ background: 'rgba(42,10,10,0.85)' }}
+                    >
+                      <span className="text-[#C9A227] text-xs font-semibold tracking-widest uppercase">
+                        {event.category}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Event details */}
+                <div className="p-6">
+                  <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] text-xl font-bold mb-3 leading-snug">
+                    {event.title}
+                  </h3>
+                  {event.description && (
+                    <p className="text-[#6B6B6B] text-sm leading-relaxed mb-4">
+                      {event.description}
+                    </p>
+                  )}
+                  <div className="space-y-2 pt-4 border-t border-[#E0DDD8]">
+                    {event.location && (
+                      <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
+                        <MapPin size={13} className="text-[#C9A227] shrink-0" />
+                        <span>{event.location}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
+                      <Calendar size={13} className="text-[#C9A227] shrink-0" />
+                      <span>
+                        {formatDate(event.eventDate)}
+                        {event.eventTime && ` — ${event.eventTime}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-              </div>
-
-              {/* Event details */}
-              <div className="p-6">
-
-                {/* Category tag */}
-                <div className="text-[#C9A227] text-xs font-semibold tracking-[0.2em] uppercase mb-3">
-                  {event.category}
-                </div>
-
-                {/* Event title */}
-                <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] text-xl font-bold mb-3 leading-snug">
-                  {event.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-[#6B6B6B] text-sm leading-relaxed mb-4">
-                  {event.description}
-                </p>
-
-                {/* Location */}
-                <div className="flex items-center gap-2 text-xs text-[#6B6B6B]">
-                  <MapPin size={13} className="text-[#C9A227]" />
-                  <span>{event.location}</span>
-                </div>
-
-              </div>
-
-            </div>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
       </div>
     </section>

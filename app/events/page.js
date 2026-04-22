@@ -44,14 +44,15 @@ export default async function EventsPage() {
 
   const getDay = (dateStr) => {
     if (!dateStr) return ''
-    return new Date(dateStr).getDate().toString().padStart(2, '0')
+    return dateStr.split('-')[2]
   }
 
   const getMonth = (dateStr) => {
     if (!dateStr) return ''
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short' })
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    return months[parseInt(dateStr.split('-')[1]) - 1]
   }
-
+  
   return (
     <main>
       {/* Hero */}

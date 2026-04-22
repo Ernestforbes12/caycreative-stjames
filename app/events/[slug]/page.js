@@ -71,19 +71,20 @@ export default async function EventPage({ params }) {
    */
   if (!event) notFound()
 
+ 
+
   /**
    * Format date — converts 2026-05-29 to May 29, 2026
+   * 
    */
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    const [year, month, day] = dateStr.split('-')
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    return `${weekdays[date.getDay()]}, ${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`
   }
-
   return (
     <main>
 
