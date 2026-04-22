@@ -18,10 +18,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 
-/**
- * Navigation links array
- * Add or remove pages here — the map below renders them automatically
- */
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
@@ -33,37 +29,25 @@ const navLinks = [
 ]
 
 export default function Navbar() {
-  /**
-   * scrolled — tracks if user has scrolled past 60px
-   * Controls the transparent vs frosted glass background
-   */
   const [scrolled, setScrolled] = useState(false)
-
-  /**
-   * menuOpen — tracks if mobile hamburger menu is open or closed
-   */
   const [menuOpen, setMenuOpen] = useState(false)
 
-  /**
-   * useEffect — attaches scroll event listener when component mounts
-   * Cleans up the listener when component unmounts to prevent memory leaks
-   */
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 60)
     }
-
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+      className={`fixed w-full z-40 transition-all duration-500 ${
         scrolled
           ? 'bg-[#FAF7F2]/95 backdrop-blur-md shadow-sm'
           : 'bg-transparent'
       }`}
+      style={{ top: '0px' }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
@@ -106,7 +90,7 @@ export default function Navbar() {
           Join Us Sunday
         </button>
 
-        {/* Mobile Menu Button — prayer hands when closed, X when open */}
+        {/* Mobile Hamburger Button */}
         <button
           className={`md:hidden transition-colors duration-300 ${
             scrolled ? 'text-[#7A1B1B]' : 'text-white'
@@ -125,7 +109,6 @@ export default function Navbar() {
               xmlns="http://www.w3.org/2000/svg"
               className="transition-transform duration-300 hover:scale-110"
             >
-              {/* Prayer hands SVG — two hands pressed together */}
               <path
                 d="M20 48 C20 48 14 42 12 34 C10 26 12 18 16 14 C18 12 20 12 21 13 C22 14 22 16 21 18 L19 24"
                 stroke="currentColor"
@@ -182,7 +165,6 @@ export default function Navbar() {
                 strokeLinecap="round"
                 fill="none"
               />
-              {/* Base of hands */}
               <path
                 d="M20 48 Q32 52 44 48"
                 stroke="currentColor"
@@ -193,7 +175,6 @@ export default function Navbar() {
             </svg>
           )}
         </button>
-        
       </div>
 
       {/* Mobile Menu Dropdown */}
