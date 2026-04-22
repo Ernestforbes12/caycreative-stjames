@@ -1,18 +1,28 @@
 /**
  * Event Schema — sanity/schemas/event.js
+ * * Defines the structure of a church event in Sanity CMS.
+ *  * Church staff can create and manage events through Sanity Studio.
+
  *
- * Defines the structure of a church event in Sanity CMS.
- * Church staff can create and manage events through Sanity Studio.
- *
+
  * Fields:
+
  * - title — event name
+
  * - description — what the event is about
+
  * - eventDate — when the event takes place
+
  * - eventTime — what time the event starts
+
  * - location — where the event is held
+
  * - category — type of event
+
  * - image — event photo
+
  * - featured — whether to show on homepage events preview
+
  */
 
 export default {
@@ -24,6 +34,17 @@ export default {
       name: 'title',
       title: 'Event Title',
       type: 'string',
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      description: 'Auto-generated URL for this event — click "Generate"',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
       validation: Rule => Rule.required()
     },
     {
@@ -94,8 +115,16 @@ export default {
   preview: {
     select: {
       title: 'title',
-      subtitle: 'eventDate',
+      date: 'eventDate',
       media: 'image'
+    },
+    prepare(selection) {
+      const { title, date, media } = selection
+      return {
+        title: title,
+        subtitle: date ? new Date(date).toLocaleDateString() : 'No date set',
+        media: media
+      }
     }
   }
 }
