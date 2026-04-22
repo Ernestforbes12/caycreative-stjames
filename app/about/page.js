@@ -13,6 +13,16 @@
 
 import Image from 'next/image'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { sanityClient } from '@/lib/sanity'
+
+const teamQuery = `*[_type == "teamMember"] | order(order asc) {
+  _id,
+  name,
+  role,
+  ministry,
+  bio,
+  "photo": photo.asset->url
+}`
 
 /**
  * Page metadata — SEO
@@ -50,7 +60,24 @@ const values = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  let teamMembers = []
+  try {
+    teamMembers = await sanityClient.fetch(teamQuery)
+  } catch (error) {
+    console.error('Failed to fetch team members:', error)
+  }
+
+  /**
+   * Group team members by ministry
+   * So Leadership shows first, then Deacons, etc.
+   */
+  const groupedTeam = teamMembers.reduce((acc, member) => {
+    if (!acc[member.ministry]) acc[member.ministry] = []
+    acc[member.ministry].push(member)
+    return acc
+  }, {})
+
   return (
     <main>
 
@@ -278,7 +305,85 @@ export default function AboutPage() {
 
         </div>
       </section>
+    {/* Ministry Team Section */}
+      {Object.keys(groupedTeam).length > 0 && (
+        <section className="py-24 bg-[#FAF7F2]">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <span className="text-[#C9A227] text-xs font-semibold tracking-[0.25em] uppercase block mb-3">
+                Serving Together
+              </span>
+              <h2
+                className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold"
+                style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)' }}
+              >
+                Our Ministry Team
+              </h2>
+              <div className="w-12 h-0.5 bg-[#C9A227] mx-auto mt-6" />
+            </div>
 
+            {/* Grouped by ministry */}
+            {Object.entries(groupedTeam).map(([ministry, members]) => (
+              <div key={ministry} className="mb-16">
+
+                {/* Ministry heading */}
+                <h3 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] text-xl font-bold mb-8 pb-3 border-b border-[#C9A227]/30">
+                  {ministry}
+                </h3>
+
+                {/* Members grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {members.map((member) => (
+                    <div
+                      key={member._id}
+                      className="bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      {/* Photo or placeholder */}
+                      {member.photo ? (
+                        <img
+                          src={member.photo}
+                          alt={member.name}
+                          className="w-20 h-20 rounded-full object-cover mx-auto mb-4"
+                          style={{ border: '2px solid #C9A227' }}
+                        />
+                      ) : (
+                        <div
+                          className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                          style={{
+                            background: 'rgba(201,162,39,0.1)',
+                            border: '2px solid #C9A227'
+                          }}
+                        >
+                          <span className="font-[family-name:var(--font-playfair)] text-[#C9A227] text-2xl font-black">
+                            {member.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Name */}
+                      <h4 className="font-[family-name:var(--font-playfair)] text-[#7A1B1B] font-bold text-sm mb-1">
+                        {member.name}
+                      </h4>
+
+                      {/* Role */}
+                      <p className="text-[#C9A227] text-xs tracking-widest uppercase mb-2">
+                        {member.role}
+                      </p>
+
+                      {/* Bio */}
+                      {member.bio && (
+                        <p className="text-[#6B6B6B] text-xs leading-relaxed">
+                          {member.bio}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }

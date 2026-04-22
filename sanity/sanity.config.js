@@ -16,6 +16,7 @@ import { visionTool } from '@sanity/vision'
 import sermon from './schemas/sermon'
 import event from './schemas/event'
 import announcement from './schemas/announcement'
+import teamMember from './schemas/teamMember'
 
 export default defineConfig({
   name: 'stjames-studio',
@@ -38,6 +39,6 @@ export default defineConfig({
    * Each schema appears as a content type in the Studio sidebar
    */
   schema: {
-    types: [sermon, event, announcement],
+    types: [sermon, event, announcement, teamMember],
   },
 })
