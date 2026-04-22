@@ -19,6 +19,7 @@ const ministryLinks = [
   { label: "Women's Fellowship", href: '/about' },
   { label: "Men's Ministry", href: '/about' },
   { label: 'Music Ministry', href: '/about' },
+  { label: 'Ushers Ministry', href: '/about' },
   { label: 'Community Outreach', href: '/about' },
 ]
 

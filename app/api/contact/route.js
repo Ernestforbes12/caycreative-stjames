@@ -111,7 +111,7 @@ export async function POST(request) {
      */
     await resend.emails.send({
       from: 'St. James Website <ernest@caycreative242.com>',
-      to: 'ernestforbes2002@gmail.com',
+      to: 'stjamesnbc@gmail.com',
       subject: `New Contact Message from ${sanitize(name)} — St. James Native Baptist Church`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #FAF7F2;">
