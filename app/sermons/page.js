@@ -10,6 +10,7 @@
 
 import { sanityClient } from '@/lib/sanity'
 import { Play, Calendar, User, Headphones } from 'lucide-react'
+export const revalidate = 60
 
 export const metadata = {
   title: 'Sermons | St. James Native Baptist Church',

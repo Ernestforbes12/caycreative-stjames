@@ -12,6 +12,8 @@ import { sanityClient } from '@/lib/sanity'
 import Link from 'next/link'
 import { MapPin, Calendar } from 'lucide-react'
 
+export const revalidate = 60
+
 export const metadata = {
   title: 'Events | St. James Native Baptist Church',
   description: 'Upcoming events at St. James Native Baptist Church in Nassau, Bahamas.',
