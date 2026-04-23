@@ -25,8 +25,8 @@ const ministryLinks = [
 
 const serviceTimes = [
   { day: 'Sunday', name: 'Sunday School', time: '9:30 AM' },
-  { day: 'Sunday', name: 'Morning Worship', time: '11:00 AM' },
-  { day: 'Wednesday', name: 'Bible Study', time: '7:00 PM' },
+  { day: 'Sunday', name: 'Morning Worship', time: '10:30 AM' },
+  { day: 'Tuesday', name: 'Prayer Meeting', time: '7:00 PM — Zoom' },
 ]
 
 export default function Footer() {

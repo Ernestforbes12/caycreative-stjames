@@ -2,61 +2,74 @@
  * Give Page — app/give/page.js
  *
  * Provides online giving options for the congregation.
- * 
+ *
  * Sections:
  * - Hero — page title with church photo background
  * - Why We Give — biblical foundation for giving
- * - Giving options — Cash App, PayPal, in person
+ * - Giving options — RBC bank deposit and in person
+ * - Security notice
  * - FAQ — common questions about giving
- * - Bottom CTA — encourage first time givers
+ * - Bottom CTA
+ *
+ * Payment method: RBC Royal Bank direct deposit
+ * Account: ST JAMES NAT BAPTIST | Branch: 05745 | Account: 1572932
+ * After transfer — send screenshot to (242) 424-3282
  */
 
-import { Heart, Shield, Smartphone, DollarSign, Church, HelpCircle } from 'lucide-react'
+import { Heart, Shield, Church, HelpCircle, Building } from 'lucide-react'
 
 export const metadata = {
   title: 'Give | St. James Native Baptist Church',
   description: 'Support the ministry of St. James Native Baptist Church in Nassau, Bahamas through your generous giving.',
 }
 
+/**
+ * Giving options — RBC bank deposit and in person
+ * Updated from Cash App/PayPal to direct bank deposit
+ */
 const givingOptions = [
   {
-    icon: Smartphone,
-    title: 'Cash App',
-    description: 'Send your tithe or offering quickly and securely through Cash App.',
-    action: '$StJamesNBC',
-    actionLabel: 'Cash App Tag',
-    color: '#00D632',
-  },
-  {
-    icon: DollarSign,
-    title: 'PayPal',
-    description: 'Give securely online using your PayPal account or any major credit card.',
-    action: 'stjamesnbc@gmail.com',
-    actionLabel: 'PayPal Email',
-    color: '#003087',
+    icon: Building,
+    title: 'Direct Bank Deposit',
+    description: 'Transfer your tithes and offerings directly to the church bank account via RBC Royal Bank.',
+    details: [
+      { label: 'Bank', value: 'RBC Royal Bank' },
+      { label: 'Short Name', value: 'ST JAMES NAT BAPTIST' },
+      { label: 'Branch/Transit', value: '05745' },
+      { label: 'Account Number', value: '1572932' },
+    ],
+    note: 'After your transfer please send a screenshot to (242) 424-3282 for reconciliation.',
+    color: '#7A1B1B',
   },
   {
     icon: Church,
     title: 'In Person',
-    description: 'Give during any of our Sunday services or Wednesday Bible Study.',
-    action: 'Every Service',
-    actionLabel: 'Offering Collected',
-    color: '#7A1B1B',
+    description: 'Give during any of our Sunday services or Tuesday Prayer Meeting.',
+    details: [
+      { label: 'Sunday School', value: '9:30 AM' },
+      { label: 'Morning Worship', value: '10:30 AM' },
+      { label: 'Tuesday Prayer', value: '7:00 PM via Zoom' },
+    ],
+    note: 'Offering envelopes are available at the entrance of the sanctuary.',
+    color: '#C9A227',
   },
 ]
 
+/**
+ * FAQ — updated for bank deposit giving method
+ */
 const faqs = [
   {
-    question: 'Is my giving secure?',
-    answer: 'Yes. Cash App and PayPal both use bank level encryption to protect every transaction.',
+    question: 'Is my bank transfer secure?',
+    answer: 'Yes. RBC Royal Bank uses bank level encryption and security for all transfers. Your financial information is fully protected.',
   },
   {
-    question: 'Can I set up recurring giving?',
-    answer: 'Yes — both Cash App and PayPal allow you to schedule automatic recurring payments so you never miss a tithe.',
+    question: 'What do I put in the transfer memo?',
+    answer: 'Please include your full name in the Comments, Beneficiary Reference, Memo, or Narrative section of your transfer so the church can identify your giving.',
   },
   {
-    question: 'Will I receive a receipt for my giving?',
-    answer: 'Cash App and PayPal both provide automatic transaction receipts via email for every gift.',
+    question: 'Do I need to notify the church after transferring?',
+    answer: 'Yes — please send a screenshot of your transfer confirmation to (242) 424-3282 to assist with reconciliation.',
   },
   {
     question: 'What is my giving used for?',
@@ -116,8 +129,8 @@ export default function GivePage() {
             are a joyful response to His generosity toward us.
           </p>
           <p className="text-[#6B6B6B] leading-loose">
-            Your giving directly supports our Sunday worship services, Wednesday Bible
-            Study, community outreach programs, youth ministry, and the maintenance
+            Your giving directly supports our Sunday worship services, Tuesday Prayer
+            Meetings, community outreach programs, youth ministry, and the maintenance
             of our historic church building that has served Nassau since 1856.
           </p>
         </div>
@@ -139,18 +152,18 @@ export default function GivePage() {
             <div className="w-12 h-0.5 bg-[#C9A227] mx-auto mt-6" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {givingOptions.map((option) => {
               const Icon = option.icon
               return (
                 <div
                   key={option.title}
-                  className="bg-white p-10 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  className="bg-white p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   style={{ borderTop: `4px solid ${option.color}` }}
                 >
                   {/* Icon */}
                   <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                    className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
                     style={{ background: `${option.color}15` }}
                   >
                     <Icon size={28} style={{ color: option.color }} />
@@ -164,18 +177,29 @@ export default function GivePage() {
                     {option.description}
                   </p>
 
-                  {/* Action detail */}
+                  {/* Details table */}
                   <div
-                    className="p-3 mb-6"
+                    className="p-4 mb-4 space-y-2"
                     style={{ background: '#FAF7F2' }}
                   >
-                    <p className="text-xs text-[#6B6B6B] uppercase tracking-widest mb-1">
-                      {option.actionLabel}
-                    </p>
-                    <p className="font-semibold text-[#1A1A1A] text-sm">
-                      {option.action}
-                    </p>
+                    {option.details.map((detail) => (
+                      <div key={detail.label} className="flex justify-between items-center text-sm">
+                        <span className="text-[#6B6B6B] text-xs uppercase tracking-widest">
+                          {detail.label}
+                        </span>
+                        <span className="font-semibold text-[#1A1A1A]">
+                          {detail.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
+
+                  {/* Note */}
+                  {option.note && (
+                    <p className="text-xs text-[#6B6B6B] leading-relaxed italic">
+                      {option.note}
+                    </p>
+                  )}
 
                 </div>
               )
@@ -197,9 +221,9 @@ export default function GivePage() {
                 Your Giving is Secure
               </h3>
               <p className="text-[#6B6B6B] text-sm leading-relaxed">
-                All online giving through Cash App and PayPal is protected by
+                All bank transfers through RBC Royal Bank are protected by
                 bank level encryption and fraud protection. St. James Native
-                Baptist Church never stores your payment information.
+                Baptist Church never stores your financial information.
               </p>
             </div>
           </div>

@@ -84,6 +84,8 @@ export default {
           { title: 'Youth', value: 'Youth' },
           { title: "Women's Ministry", value: "Women's Ministry" },
           { title: "Men's Ministry", value: "Men's Ministry" },
+          { title: 'Ushers Ministry', value: 'Ushers Ministry' },
+          { title: 'Sunday School', value: 'Sunday School' },
           { title: 'Special Service', value: 'Special Service' },
           { title: 'Other', value: 'Other' },
         ]

@@ -35,7 +35,7 @@ const contactDetails = [
   {
     icon: Clock,
     title: 'Service Times',
-    lines: ['Sunday School — 9:30 AM', 'Morning Worship — 11:00 AM', 'Bible Study — Wed 7:00 PM'],
+    lines: ['Sunday School — 9:30 AM', 'Morning Worship — 10:30 AM', 'Prayer Meeting — Tue 7:00 PM (Zoom)'],
   },
 ]
 
