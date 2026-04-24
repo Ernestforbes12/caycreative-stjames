@@ -291,7 +291,7 @@ export default async function AboutPage() {
               </span>
             </div>
             <h3 className="font-[family-name:var(--font-playfair)] text-white text-2xl font-bold mb-2">
-              Pastor Name
+              Rev. Dr. Charles H. Rolle
             </h3>
             <p className="text-[#C9A227] text-xs tracking-widest uppercase mb-6">
               Senior Pastor
