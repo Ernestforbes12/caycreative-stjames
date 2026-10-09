@@ -25,15 +25,17 @@ const inter = Inter({
 
 export const metadata = {
   title: 'St. James Native Baptist Church | Nassau, Bahamas',
-  description: 'A Christ Centered Church in Nassau, Bahamas. Join us for Sunday Worship at 11:00 AM. Est. 1856.',
+  description: 'A Christ Centered Church in Nassau, Bahamas. Join us for Sunday Worship at 10:30 AM. Est. 1856.',
   keywords: 'church Nassau Bahamas, Native Baptist Church, St James Church Nassau',
   icons: {
     icon: '/favicon.ico',
     apple: '/favicon.ico',
   },
-  
+
+  // Google Search Console ownership check.
+  // Paste ONLY the code string, with no content="" and no <meta> tag.
   verification: {
-    google: content="Haqj-_3xGmDPze52",
+    google: 'content="Haqj-_3xGmDPze5214cavtPCKG5_lTgqoOYJxv75oiE',
   },
 }
 
