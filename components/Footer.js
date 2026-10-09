@@ -141,7 +141,7 @@ export default function Footer() {
               style={{ filter: 'brightness(0) invert(1)' }}
             />
             <span className="text-white/30 group-hover:text-[#C9A227] transition-colors duration-300">
-              Designed & Developed by Cay Creative
+              Designed & Developed by Cay Creative 242
             </span>
           </a>
         </div>
