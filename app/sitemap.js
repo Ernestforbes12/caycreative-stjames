@@ -14,7 +14,7 @@
 
 import { sanityClient } from '@/lib/sanity'
 
-const baseUrl = 'https://caycreative-stjames.vercel.app'
+const baseUrl = 'https://www.stjamesnativebaptist.com'
 
 /**
  * GROQ query — fetches all event slugs for sitemap
