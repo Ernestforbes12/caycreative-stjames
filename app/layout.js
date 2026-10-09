@@ -35,7 +35,7 @@ export const metadata = {
   // Google Search Console ownership check.
   // Paste ONLY the code string, with no content="" and no <meta> tag.
   verification: {
-    google: 'content="Haqj-_3xGmDPze5214cavtPCKG5_lTgqoOYJxv75oiE',
+    google: 'Haqj-_3xGmDPze5214cavtPCKG5_lTgqoOYJxv75oiE',
   },
 }
 
