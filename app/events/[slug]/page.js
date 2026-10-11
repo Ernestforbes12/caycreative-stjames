@@ -1,23 +1,25 @@
 /**
- * Individual Event Page — app/events/[slug]/page.js
+ * Individual Event Page: app/events/[slug]/page.js
  *
  * Dynamically generated page for each event.
- * URL structure: /events/high-tea-party
+ * URL structure: /events/pink-praise-and-paint
  *
- * Next.js generates these pages at request time using
- * the slug from Sanity CMS.
- *
- * generateStaticParams — pre-generates all event pages
- * at build time for better performance and SEO.
+ * Features:
+ * - Event details pulled from Sanity CMS
+ * - "View Full Flyer" button that opens the uncropped flyer image
+ * - Dates read straight from the YYYY-MM-DD string (no timezone shifts)
  */
 
 import { sanityClient } from '@/lib/sanity'
-import { MapPin, Calendar, ArrowLeft } from 'lucide-react'
+import { MapPin, Calendar, ArrowLeft, ZoomIn } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+// Refresh this page's Sanity content at most once every 60 seconds
+export const revalidate = 60
+
 /**
- * GROQ query — fetches a single event by slug
+ * GROQ query: fetches a single event by slug
  */
 const eventQuery = `*[_type == "event" && slug.current == $slug][0] {
   _id,
@@ -32,7 +34,7 @@ const eventQuery = `*[_type == "event" && slug.current == $slug][0] {
 }`
 
 /**
- * GROQ query — fetches all event slugs for static generation
+ * GROQ query: fetches all event slugs for static generation
  */
 const allSlugsQuery = `*[_type == "event" && defined(slug.current)] {
   "slug": slug.current
@@ -41,7 +43,6 @@ const allSlugsQuery = `*[_type == "event" && defined(slug.current)] {
 /**
  * generateStaticParams
  * Tells Next.js which event pages to pre-generate at build time
- * This makes individual event pages fast and SEO friendly
  */
 export async function generateStaticParams() {
   const events = await sanityClient.fetch(allSlugsQuery)
@@ -50,7 +51,7 @@ export async function generateStaticParams() {
 
 /**
  * generateMetadata
- * Dynamically generates SEO metadata for each event page
+ * Builds SEO metadata for each event page
  */
 export async function generateMetadata({ params }) {
   const { slug } = await params
@@ -62,29 +63,27 @@ export async function generateMetadata({ params }) {
   }
 }
 
+/**
+ * formatDate
+ * Converts 2026-10-24 into "Saturday, October 24, 2026".
+ * Splits the string manually so the browser timezone can never shift the day.
+ */
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const [year, month, day] = dateStr.split('-')
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+  return `${weekdays[date.getDay()]}, ${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`
+}
+
 export default async function EventPage({ params }) {
   const { slug } = await params
   const event = await sanityClient.fetch(eventQuery, { slug })
 
-  /**
-   * If event not found — show 404 page
-   */
+  // If the event does not exist, show the 404 page
   if (!event) notFound()
 
- 
-
-  /**
-   * Format date — converts 2026-05-29 to May 29, 2026
-   * 
-   */
-  const formatDate = (dateStr) => {
-    if (!dateStr) return ''
-    const [year, month, day] = dateStr.split('-')
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
-    const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-    return `${weekdays[date.getDay()]}, ${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`
-  }
   return (
     <main>
 
@@ -140,7 +139,7 @@ export default async function EventPage({ params }) {
             {event.eventDate && (
               <div className="flex items-center gap-2 text-white/70 text-sm">
                 <Calendar size={16} className="text-[#C9A227]" />
-                <span>{formatDate(event.eventDate)}{event.eventTime && ` — ${event.eventTime}`}</span>
+                <span>{formatDate(event.eventDate)}{event.eventTime && `, ${event.eventTime}`}</span>
               </div>
             )}
             {event.location && (
@@ -175,6 +174,20 @@ export default async function EventPage({ params }) {
             </div>
           )}
 
+          {/* View Full Flyer button: opens the uncropped image in a new tab */}
+          {event.image && (
+            <a
+              href={event.image}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 mt-10 px-8 py-4 text-white text-xs font-semibold tracking-widest uppercase transition-all duration-300 hover:opacity-80"
+              style={{ background: '#7A1B1B' }}
+            >
+              <ZoomIn size={16} />
+              View Full Flyer
+            </a>
+          )}
+
           {/* Info cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-12">
             {event.eventDate && (
@@ -184,7 +197,7 @@ export default async function EventPage({ params }) {
               >
                 <div className="flex items-center gap-3 mb-2">
                   <Calendar size={18} className="text-[#C9A227]" />
-                  <span className="text-xs font-semibold tracking-widest uppercase text-[#6B6B6B]">Date & Time</span>
+                  <span className="text-xs font-semibold tracking-widest uppercase text-[#6B6B6B]">Date and Time</span>
                 </div>
                 <p className="text-[#1A1A1A] font-medium text-sm">
                   {formatDate(event.eventDate)}
