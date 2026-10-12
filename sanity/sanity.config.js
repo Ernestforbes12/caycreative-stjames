@@ -17,6 +17,7 @@ import sermon from './schemas/sermon'
 import event from './schemas/event'
 import announcement from './schemas/announcement'
 import teamMember from './schemas/teamMember'
+import album from './schemas/album'
 
 export default defineConfig({
   name: 'stjames-studio',
@@ -39,6 +40,6 @@ export default defineConfig({
    * Each schema appears as a content type in the Studio sidebar
    */
   schema: {
-    types: [sermon, event, announcement, teamMember],
+    types: [sermon, event, announcement, teamMember, album],
   },
 })
