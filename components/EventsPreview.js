@@ -1,13 +1,13 @@
 /**
- * EventsPreview Component — components/EventsPreview.js
+ * EventsPreview Component: components/EventsPreview.js
  *
- * Displays the three most upcoming featured events on the homepage.
- * Fetches live data from Sanity CMS — no hardcoded events.
+ * Shows up to three UPCOMING events on the homepage, fetched from Sanity.
+ * Past events are hidden automatically.
  *
- * Church staff can mark events as "Featured on Homepage" in Sanity Studio
- * to control which events appear here.
+ * Events marked "Featured on Homepage" in the studio come first,
+ * then the soonest remaining events fill the rest.
  *
- * If fewer than 3 events are featured — shows the 3 soonest upcoming events.
+ * This is a Server Component (no 'use client'), so it can fetch data directly.
  */
 
 import { sanityClient } from '@/lib/sanity'
@@ -15,11 +15,10 @@ import Link from 'next/link'
 import { MapPin, Calendar, ChevronRight } from 'lucide-react'
 
 /**
- * GROQ query — fetches 3 upcoming events
- * Prioritizes featured events first
- * Falls back to soonest upcoming events
+ * GROQ query: upcoming events only, featured first, then soonest.
+ * [0...3] limits the result to three events.
  */
-const eventsQuery = `*[_type == "event"] | order(featured desc, eventDate asc)[0...3] {
+const eventsQuery = `*[_type == "event" && eventDate >= $today] | order(featured desc, eventDate asc)[0...3] {
   _id,
   title,
   description,
@@ -32,37 +31,33 @@ const eventsQuery = `*[_type == "event"] | order(featured desc, eventDate asc)[0
   "image": image.asset->url
 }`
 
+/**
+ * Date helpers
+ * They read the YYYY-MM-DD string directly, so timezones can never
+ * shift the day by one.
+ */
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+const getDay = (dateStr) => (dateStr ? dateStr.split('-')[2] : '')
+
+const getMonth = (dateStr) => (dateStr ? MONTHS_SHORT[parseInt(dateStr.split('-')[1]) - 1] : '')
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const [year, month, day] = dateStr.split('-')
+  return `${MONTHS_LONG[parseInt(month) - 1]} ${parseInt(day)}, ${year}`
+}
+
 export default async function EventsPreview() {
+  // Today's date in Nassau as YYYY-MM-DD, so an event stays visible all day
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Nassau' })
+
   let events = []
   try {
-    events = await sanityClient.fetch(eventsQuery)
+    events = await sanityClient.fetch(eventsQuery, { today })
   } catch (error) {
     console.error('Failed to fetch events:', error)
-  }
-
-  /**
-   * Format day — e.g. 18
-   */
- const getDay = (dateStr) => {
-    if (!dateStr) return ''
-    return dateStr.split('-')[2]
-  }
-
-  const getMonth = (dateStr) => {
-    if (!dateStr) return ''
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    return months[parseInt(dateStr.split('-')[1]) - 1]
-  }
-  /**
-   * Format full date — e.g. May 18, 2026
-   */
-  const formatDate = (dateStr) => {
-    if (!dateStr) return ''
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
   }
 
   return (
@@ -90,7 +85,7 @@ export default async function EventsPreview() {
           </Link>
         </div>
 
-        {/* No events state */}
+        {/* Empty state */}
         {events.length === 0 && (
           <div className="text-center py-16">
             <p className="text-[#6B6B6B]">No upcoming events at this time. Check back soon.</p>
@@ -170,7 +165,7 @@ export default async function EventsPreview() {
                       <Calendar size={13} className="text-[#C9A227] shrink-0" />
                       <span>
                         {formatDate(event.eventDate)}
-                        {event.eventTime && ` — ${event.eventTime}`}
+                        {event.eventTime && `, ${event.eventTime}`}
                       </span>
                     </div>
                   </div>
